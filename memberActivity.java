@@ -17,7 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class memberActivity extends AppCompatActivity {
     private static final String TAG = "memberActivity";
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +47,17 @@ public class memberActivity extends AppCompatActivity {
 
     private void profileUpdate(){
         String name = ((EditText)findViewById(R.id.nameeditText)).getText().toString();
-        String phone = ((EditText)findViewById(R.id.phoneeditText)).getText().toString();
+        int boxnum = Integer.parseInt(((EditText)findViewById(R.id.boxEditText)).getText().toString());
         String date = ((EditText)findViewById(R.id.dateeditText)).getText().toString();
-        String address = ((EditText)findViewById(R.id.addresseditText)).getText().toString();
 
-        if(name.length() > 0 && phone.length() > 9 && date.length() > 5 && address.length()>0){
+        if(name.length() > 0 && boxnum>100000 && date.length() == 8){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            memberinfo memberinfo = new memberinfo(name, phone, date, address);
+            memberinfo memberinfo = new memberinfo(name, boxnum, date, false);
 
             if (user != null) {
-                db.collection("users").document(user.getUid()).set(memberinfo)
+                db.collection("users").document(user.getEmail()).set(memberinfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {

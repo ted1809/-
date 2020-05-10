@@ -2,15 +2,15 @@ package com.example.logindb;
 
 public class memberinfo {
     private String name;
-    private String phone;
+    private int boxnum;
     private String date;
-    private String address;
+    private boolean access;
 
-    public memberinfo(String name, String phone, String date, String address){
+    public memberinfo(String name, int boxnum, String date, boolean access){
         this.name = name;
-        this.phone = phone;
+        this.boxnum = boxnum;
         this.date = date;
-        this.address = address;
+        this.access = access;
     }
 
     public String getName(){
@@ -19,11 +19,11 @@ public class memberinfo {
     public void setName(){
         this.name = name;
     }
-    public String getPhone(){
-        return this.phone;
+    public int getBoxnum(){
+        return this.boxnum;
     }
-    public void setPhone(){
-        this.phone = phone;
+    public void setBoxnum(){
+        this.boxnum = boxnum;
     }
     public String getDate(){
         return this.date;
@@ -31,10 +31,10 @@ public class memberinfo {
     public void setDate(){
         this.date = date;
     }
-    public String getAddress(){
-        return this.address;
+    public Boolean getAccess(){
+        return this.access;
     }
-    public void setAddress(){
-        this.address = address;
+    public void setAccess(){
+        this.access = access;
     }
 }

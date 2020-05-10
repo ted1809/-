@@ -7,9 +7,9 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="131dp"
         android:gravity="center"
-        android:text="회원정보"
+        android:text="물건을 선택해주세요"
         android:textColor="#000000"
         android:textColorLink="#000000"
         android:textSize="24sp"
@@ -22,35 +22,51 @@
         android:orientation="vertical"
         android:paddingBottom="5dp">
 
-        <EditText
-            android:id="@+id/nameeditText"
+        <Spinner
+            android:id="@+id/goodsSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="이름"
-            android:inputType="textPersonName" />
+            android:layout_height="59dp" />
 
-        <EditText
-            android:id="@+id/boxEditText"
+        <TextView
+            android:id="@+id/boxnumTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="사물함번호"
-            android:inputType="phone" />
+            android:includeFontPadding="false"
+            android:text="등록사물함"
+            android:textSize="24sp" />
 
-        <EditText
-            android:id="@+id/dateeditText"
+        <TextView
+            android:id="@+id/userIDTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="ex) 20200617"
-            android:inputType="date" />
+            android:text="사용자이름"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/goodsNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="물건이름"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/detailTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="상세정보"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/checkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="확인" />
+            android:text="변경" />
+
+        <Button
+            android:id="@+id/backbutton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="뒤로가기" />
 
     </LinearLayout>
 

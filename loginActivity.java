@@ -25,7 +25,7 @@ public class loginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();                                         //유저 객체를 받아온다
 
         findViewById(R.id.checkButton).setOnClickListener(onClickLitsener);
         findViewById(R.id.gotoPasswordResetButton).setOnClickListener(onClickLitsener);

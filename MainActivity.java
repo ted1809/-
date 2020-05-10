@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(signUpActivity.class);
         }else{
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference docRef = db.collection("users").document(user.getUid());
+            DocumentReference docRef = db.collection("users").document(user.getEmail());
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         findViewById(R.id.logout).setOnClickListener(onClickListener);
+        findViewById(R.id.documentButton).setOnClickListener(onClickListener);
 
     }
 
@@ -63,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.logout:
                     FirebaseAuth.getInstance().signOut();
                     startActivity(signUpActivity.class);
+                    break;
+                case R.id.documentButton:
+                    startActivity(selectdocumentActivity.class);
                     break;
             }
         }

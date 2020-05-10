@@ -10,9 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -21,8 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class signUpActivity extends AppCompatActivity {
     private static final String TAG = "signUpActivity";
-    private FirebaseAuth mAuth;
-    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth mAuth;                                 // 파이어베이스 이메일로그인 객체
     private static final int RC_SIGN_IN = 9001;
 
     @Override
@@ -33,17 +29,10 @@ public class signUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() != null) {
-            Intent intent = new Intent(getApplication(), MainActivity.class);
+            Intent intent = new Intent(getApplication(), MainActivity.class);   //이미 로그인이 되어있는 상태면 바로 메인으로 넘어감
             startActivity(intent);
             finish();
         }
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.checkButton).setOnClickListener(onClickLitsener);
         findViewById(R.id.getLoginbutton).setOnClickListener(onClickLitsener);
@@ -65,7 +54,7 @@ public class signUpActivity extends AppCompatActivity {
     public void onBackPressed(){
         super.onBackPressed();
         moveTaskToBack(true);
-        android.os.Process.killProcess(android.os.Process.myPid());
+        android.os.Process.killProcess(android.os.Process.myPid());     //뒤로가기 버튼 누르면 앱 종료되게 하는 함수
         System.exit(1);
     }
 
@@ -89,20 +78,20 @@ public class signUpActivity extends AppCompatActivity {
     private void signUp(){
         String email = ((EditText)findViewById(R.id.emaileditText)).getText().toString();
         String password = ((EditText)findViewById(R.id.passwordeditText)).getText().toString();
-        String passworCheck = ((EditText)findViewById(R.id.passwordCheckeditText)).getText().toString();
+        String passworCheck = ((EditText)findViewById(R.id.passwordCheckeditText)).getText().toString();  //이메일, 비밀번호, 확인용비밀번호 입력받음
 
-        if(email.length() > 0 && password.length() > 0 && passworCheck.length() > 0){
+        if(email.length() > 0 && password.length() > 0 && passworCheck.length() > 0){                   //3개의 string이 모두 입력되어야 버튼입력이 가능
             if(password.equals(passworCheck)){
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
+                                if (task.isSuccessful()) {                                              //이메일 가입 성공시
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d(TAG, "createUserWithEmail:success");
-                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    FirebaseUser user = mAuth.getCurrentUser();                         //유저 객체 생성
                                     startToast("회원가입을 성공했습니다.");
-                                    startActivity(MainActivity.class);
+                                    startActivity(MainActivity.class);                                  //메인액티비티로 넘어감
                                     //UI
                                 } else {
                                     if(task.getException() != null){
