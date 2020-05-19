@@ -1,10 +1,10 @@
 package com.example.logindb;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,20 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
 
 public class documentActivity extends AppCompatActivity {
     private static final String TAG = "documentActivity";
-    memberinfo memberinfo;
-    Spinner boxIDspinner;
-    ArrayList<String> BNarray = new ArrayList<>();
 
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +46,6 @@ public class documentActivity extends AppCompatActivity {
                 });*/
     }
 
-
     View.OnClickListener onClickLitsener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -70,14 +63,14 @@ public class documentActivity extends AppCompatActivity {
         String dname = ((EditText)findViewById(R.id.dnameEditText)).getText().toString();
         String detail = ((EditText)findViewById(R.id.detailEditText)).getText().toString();
 
-
-
         if(dname.length() > 0){
-            /*DocumentReference docRef = db.collection("users").document(user.getEmail());
+            /*String docuRFID = (String)getIntent().getSerializableExtra("goodsRFID");
+
+            DocumentReference docRef = db.collection("goods").document(docuRFID);
             docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    memberinfo = documentSnapshot.toObject(memberinfo.class);
+                    DI = documentSnapshot.toObject(documentInfo.class);
                 }
             });*/
 
@@ -85,12 +78,14 @@ public class documentActivity extends AppCompatActivity {
                 detail = "없음";
             }
 
-            documentInfo GETdocumentInfo = (documentInfo)getIntent().getSerializableExtra("documentINFO");
-            String docuRFID = (String)getIntent().getSerializableExtra("goodsRFID");
+            Intent intent = getIntent();
+            documentInfo goodsRef = (documentInfo) intent.getSerializableExtra("goodsRef");
+            String goodsRfid = intent.getExtras().getString("goodsRfid");
+            memberinfo memberRef = (memberinfo) intent.getSerializableExtra("memberRef");
 
-            documentInfo documentInfo = new documentInfo(get_docu_boxnum(GETdocumentInfo), get_docu_userID(GETdocumentInfo), dname, detail, false);
+            documentInfo documentInfo = new documentInfo(get_docu_boxnum(goodsRef), get_user_name(memberRef), dname, detail, false);
 
-            db.collection("goods").document(docuRFID).set(documentInfo)
+            db.collection("goods").document(goodsRfid).set(documentInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -105,18 +100,25 @@ public class documentActivity extends AppCompatActivity {
                             Log.w(TAG, "Error adding document", e);
                         }
                     });
-
-
         }else{
             startToast("물건의 이름은 정해주어야 합니다.");
         }
     }
 
-    public int get_docu_boxnum(documentInfo DI){
+
+
+    public String get_docu_boxnum(documentInfo DI){
         return DI.getBoxnum();
     }
-    public String get_docu_userID(documentInfo DI){
-        return DI.getUserID();
+
+    public String get_user_name(memberinfo user){
+        return user.getName();
+    }
+
+    private void startDActivity(Class c, memberinfo a){
+        Intent intent=new Intent(this,c);
+        intent.putExtra("memberclass", a);
+        startActivity(intent);
     }
 
     private void startToast(String msg){

@@ -3,29 +3,17 @@ package com.example.logindb;
 import java.io.Serializable;
 
 public class documentInfo implements Serializable {
-    private int boxnum;
+    private String boxnum;
     private String userID;
     private String goodsName;
     private String detail;
     private boolean inOut;
 
     public documentInfo(){
-        this.boxnum = 123456;
-        this.userID = "";
-        this.goodsName = "";
-        this.detail = "";
-        this.inOut = false;
+
     }
 
-    public documentInfo(documentInfo d){
-        this.boxnum = d.getBoxnum();
-        this.userID = d.getUserID();
-        this.goodsName = d.getGoodsName();
-        this.detail = d.getDetail();
-        this.inOut = d.getInOut();
-    }
-
-    public documentInfo(int boxnum, String userID, String goodsName, String detail, boolean inOut){
+    public documentInfo(String boxnum, String userID, String goodsName, String detail, boolean inOut){
         this.boxnum = boxnum;
         this.userID = userID;
         this.goodsName = goodsName;
@@ -33,7 +21,7 @@ public class documentInfo implements Serializable {
         this.inOut = inOut;
     }
 
-    public int getBoxnum(){
+    public String getBoxnum(){
         return this.boxnum;
     }
     public void setBoxnum(){

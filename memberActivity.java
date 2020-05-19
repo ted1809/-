@@ -47,10 +47,10 @@ public class memberActivity extends AppCompatActivity {
 
     private void profileUpdate(){
         String name = ((EditText)findViewById(R.id.nameeditText)).getText().toString();
-        int boxnum = Integer.parseInt(((EditText)findViewById(R.id.boxEditText)).getText().toString());
+        String boxnum = ((EditText)findViewById(R.id.boxEditText)).getText().toString();
         String date = ((EditText)findViewById(R.id.dateeditText)).getText().toString();
 
-        if(name.length() > 0 && boxnum>100000 && date.length() == 8){
+        if(name.length() > 0 && Integer.parseInt(boxnum)>100000 && date.length() == 8){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    memberinfo sendmember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
 
         if (user == null) {
             startActivity(signUpActivity.class);
@@ -50,11 +54,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+            docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    memberinfo memberinfo = documentSnapshot.toObject(memberinfo.class);
+                    sendpack(memberinfo);
+                }
+            });
         }
 
         findViewById(R.id.logout).setOnClickListener(onClickListener);
         findViewById(R.id.documentButton).setOnClickListener(onClickListener);
 
+    }
+
+    private void sendpack(memberinfo memberinfo){
+        sendmember = new memberinfo(memberinfo);
+        Log.d(TAG, memberinfo.getName());
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener(){
@@ -64,9 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.logout:
                     FirebaseAuth.getInstance().signOut();
                     startActivity(signUpActivity.class);
+                    finish();
                     break;
                 case R.id.documentButton:
-                    startActivity(selectdocumentActivity.class);
+                    startDActivity(selectdocumentActivity.class);
                     break;
             }
         }
@@ -74,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void startActivity(Class c){
         Intent intent=new Intent(this,c);
+        startActivity(intent);
+    }
+
+    private void startDActivity(Class c){
+        Intent intent=new Intent(this,c);
+        intent.putExtra("memberRef", sendmember);
         startActivity(intent);
     }
 }

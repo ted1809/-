@@ -1,21 +1,24 @@
 package com.example.logindb;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,37 +29,136 @@ import java.util.ArrayList;
 
 public class selectdocumentActivity extends AppCompatActivity {
     private static final String TAG = "selectdocumentActivity";
-    TextView boxnumTextView,userIDTextView, goodsNameTextView, detailTextView; //물건에 따라 이름을 바꿀 텍스트뷰
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<documentInfo> arrayList;
+    private ArrayList<String> RFIDname;
+
     documentInfo DI; //물건객체
-    Spinner goodsSpinner; // 물건 RFID 목록을 띄울 스피너
-    ArrayList<String> GNarray = new ArrayList<>();  //물건 RFID 이름 목록을 넣을 리스트객체
-    String documentRFID;    //물건 RFID를 넣을 문자열
+    //ArrayList<String> documentRFID = new ArrayList<String>();    //물건 RFID를 넣을 문자열
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_document);
+        setContentView(R.layout.activity_content);
 
-        findViewById(R.id.checkButton).setOnClickListener(onClickLitsener);
-        findViewById(R.id.backbutton).setOnClickListener(onClickLitsener);
+        /*DocumentReference docRef = db.collection("users").document(user.getEmail());
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                memberinfo memberinfo = documentSnapshot.toObject(memberinfo.class);
+                if(memberinfo != null) {
+                    boxNumber = memberinfo.getBoxnum();
+                    Log.d(TAG, " => " + boxNumber);
+                }
+            }
+        });*/
 
-        makeArray(); // 물건 RFID 리스트를 만들어주는 함수
+        Intent intent = getIntent();
+        final memberinfo memberRef = (memberinfo)intent.getSerializableExtra("memberRef");
+        Log.d(TAG, " => " + get_member_boxnum(memberRef));
 
-        goodsSpinner = (Spinner)findViewById(R.id.goodsSpinner);
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, GNarray);
+
+        recyclerView = findViewById(R.id.docurecyclerView);
+        recyclerView.setHasFixedSize(true); //리사이클러뷰 기존 성능 강화
+        layoutManager = new LinearLayoutManager((this));
+        recyclerView.setLayoutManager(layoutManager);
+        arrayList = new ArrayList<>();
+        RFIDname = new ArrayList<>();
+
+        //makeArray(); // 물건 RFID 리스트를 만들어주는 함수
+
+        arrayList.clear();
+
+        startToast("물건을 선택하시면 편집하실 수 있습니다.");
+
+        db.collection("goods")
+                .whereEqualTo("boxnum", get_member_boxnum(memberRef))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                DocumentReference docRef = db.collection("goods").document(document.getId());
+                                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        documentInfo documentInfo = documentSnapshot.toObject(documentInfo.class);
+                                        if (documentInfo != null) {
+                                            arrayList.add(documentInfo);
+                                            Log.d(TAG, " => " + arrayList);
+                                            adapter.notifyDataSetChanged(); //리스트 저장 및 새로고침
+                                        }
+                                    }
+                                });
+                                RFIDname.add(document.getId());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        /*readData(new Callback() {
+            @Override
+            public void onCallback(List<documentInfo> list) {
+                Log.d(TAG, "SUCCESS");
+            }
+        });*/
+
+        adapter = new docuAdapter(arrayList, this);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener(){
+            @Override
+            public void onClick(View view, int position) {
+                Log.d(TAG, "SUCCESS");
+                documentInfo docu = arrayList.get(position);
+                Log.d(TAG, "=>" + docu.getBoxnum());
+                String rfid = RFIDname.get(position);
+                Log.d(TAG, "=>" + rfid);
+                startDActivity(documentActivity.class, docu, memberRef, rfid);
+                finish();
+            }
+        }));
+
+
+
+
+        /*ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, documentRFID) ;
+
+        ListView listview = (ListView) findViewById(R.id.docuListView) ;
+        listview.setAdapter(adapter) ;
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View v, int position, long id) {
+                String RFID = (String) parent.getItemAtPosition(position) ;
+                startDActivity(documentActivity.class, RFID);
+            }
+        }) ;*/
+        /*goodsSpinner = (Spinner)findViewById(R.id.goodsSpinner);
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, docuID);
         goodsSpinner.setAdapter(arrayAdapter);  // 스피너 연결
 
         boxnumTextView = (TextView)findViewById(R.id.boxnumTextView);
         userIDTextView = (TextView)findViewById(R.id.userIDTextView);
         goodsNameTextView = (TextView)findViewById(R.id.goodsNameTextView);
-        detailTextView = (TextView)findViewById(R.id.detailTextView); // 각 텍스트뷰를 연결
+        detailTextView = (TextView)findViewById(R.id.detailTextView); // 각 텍스트뷰를 연결*/
 
-        goodsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        /*goodsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { // 스피너가 선택되었을 때 이벤트 설정
-                documentRFID = (String)goodsSpinner.getSelectedItem();
+                documentRFID = docuID.get(position);
+                startToast(documentRFID + "가 선택되었습니다");
                 Log.i(TAG, "Spinner selected item = "+documentRFID);
                 db_item(documentRFID);
 
@@ -68,28 +170,65 @@ public class selectdocumentActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
-        });
+        });*/
     }
 
+    public interface ClickListener {
+        void onClick(View view, int position);
+    }
 
-    View.OnClickListener onClickLitsener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.checkButton:
-                    Log.e("클릭", "클릭");
-                    startDActivity(documentActivity.class);
-                    break;
-                case R.id.backbutton:
-                    finish();
-                    break;
-            }
+    public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+
+        private GestureDetector gestureDetector;
+        private selectdocumentActivity.ClickListener clickListener;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final selectdocumentActivity.ClickListener clickListener) {
+            this.clickListener = clickListener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+            });
+
         }
-    };
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        View child = rv.findChildViewUnder(e.getX(), e.getY());
+        if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
+            clickListener.onClick(child, rv.getChildAdapterPosition(child));
+        }
+        return false;
+    }
 
-    private void makeArray(){
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+    }
+}
+
+    private String get_member_boxnum(memberinfo memberinfo){
+        return memberinfo.getBoxnum();
+    }
+    private String get_member_name(memberinfo memberinfo){
+        return memberinfo.getName();
+    }
+
+    /*private void readData(final Callback callback){
+
+    }
+
+    private interface Callback{
+        void onCallback(List<documentInfo> list);
+    }*/
+
+
+    /*private void makeArray(){
         db.collection("goods")
-                .whereEqualTo("userID", "none")
+                .whereEqualTo("boxnum", user_get_boxnum())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -97,43 +236,30 @@ public class selectdocumentActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                GNarray.add(document.getId());
+                                documentRFID.add(document.getId());
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
-    }
+    }*/
 
-    private void db_item(String id){
-        DocumentReference docRef = db.collection("goods").document(id);
+    /*public void db_item(){
+        DocumentReference docRef = db.collection("users").document(user.getEmail());
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                DI = documentSnapshot.toObject(documentInfo.class);
+                memberinfo = documentSnapshot.toObject(memberinfo.class);
             }
         });
-    }
+    }*/
 
-    public int get_docu_boxnum(){
-        return DI.getBoxnum();
-    }
-    public String get_docu_userID(){
-        return DI.getUserID();
-    }
-    public String get_docu_goodsName(){
-        return DI.getGoodsName();
-    }
-    public String get_docu_detail(){
-        return DI.getDetail();
-    }
-
-    private void startDActivity(Class c){
+    private void startDActivity(Class c, documentInfo a,memberinfo b, String d){
         Intent intent=new Intent(this,c);
-        intent.putExtra("documentINFO",DI);
-        Log.d(TAG, "documentINFO: "+ DI.getBoxnum());
-        intent.putExtra("goodsRFID", documentRFID);
+        intent.putExtra("goodsRef", a);
+        intent.putExtra("memberRef", b);
+        intent.putExtra("goodsRfid", d);
         startActivity(intent);
     }
 
