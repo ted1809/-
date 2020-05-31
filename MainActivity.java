@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.logout).setOnClickListener(onClickListener);
         findViewById(R.id.documentButton).setOnClickListener(onClickListener);
+        findViewById(R.id.memberchangeButton).setOnClickListener(onClickListener);
+        findViewById(R.id.logLookupButton).setOnClickListener(onClickListener);
 
     }
 
@@ -84,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.documentButton:
                     startDActivity(selectdocumentActivity.class);
+                    break;
+                case R.id.memberchangeButton:
+                    startDActivity(memberchangeActivity.class);
+                    break;
+                case R.id.logLookupButton:
+                    startDActivity(logLookupActivity.class);
                     break;
             }
         }

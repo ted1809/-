@@ -48,13 +48,15 @@ public class memberActivity extends AppCompatActivity {
     private void profileUpdate(){
         String name = ((EditText)findViewById(R.id.nameeditText)).getText().toString();
         String boxnum = ((EditText)findViewById(R.id.boxEditText)).getText().toString();
+        String phoneNumber = ((EditText)findViewById(R.id.PhoneEditText)).getText().toString();
         String date = ((EditText)findViewById(R.id.dateeditText)).getText().toString();
 
-        if(name.length() > 0 && Integer.parseInt(boxnum)>100000 && date.length() == 8){
+        if(name.length() > 0 && Integer.parseInt(boxnum)>100000 && date.length() == 8
+        && phoneNumber.length() > 0){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            memberinfo memberinfo = new memberinfo(name, boxnum, date, false);
+            memberinfo memberinfo = new memberinfo(name, boxnum, date, phoneNumber,false);
 
             if (user != null) {
                 db.collection("users").document(user.getEmail()).set(memberinfo)

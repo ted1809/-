@@ -76,8 +76,8 @@ public class signUpActivity extends AppCompatActivity {
 
 
     private void signUp(){
-        String email = ((EditText)findViewById(R.id.emaileditText)).getText().toString();
-        String password = ((EditText)findViewById(R.id.passwordeditText)).getText().toString();
+        String email = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
+        String password = ((EditText)findViewById(R.id.phoneEditText)).getText().toString();
         String passworCheck = ((EditText)findViewById(R.id.passwordCheckeditText)).getText().toString();  //이메일, 비밀번호, 확인용비밀번호 입력받음
 
         if(email.length() > 0 && password.length() > 0 && passworCheck.length() > 0){                   //3개의 string이 모두 입력되어야 버튼입력이 가능

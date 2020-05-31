@@ -8,17 +8,26 @@ public class documentInfo implements Serializable {
     private String goodsName;
     private String detail;
     private boolean inOut;
+    private String photoURL;
 
-    public documentInfo(){
-
+    public String getPhotoURL() {
+        return photoURL;
     }
 
-    public documentInfo(String boxnum, String userID, String goodsName, String detail, boolean inOut){
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
+    public documentInfo(){
+    }
+
+    public documentInfo(String boxnum, String userID, String goodsName, String detail, boolean inOut, String photoURL){
         this.boxnum = boxnum;
         this.userID = userID;
         this.goodsName = goodsName;
         this.detail = detail;
         this.inOut = inOut;
+        this.photoURL = photoURL;
     }
 
     public String getBoxnum(){

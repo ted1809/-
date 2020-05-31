@@ -4,10 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -32,6 +35,9 @@ public class docuAdapter extends RecyclerView.Adapter<docuAdapter.CustomViewHold
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
+        Glide.with(holder.itemView)
+                .load(arrayList.get(position).getPhotoURL())
+                .into(holder.docuImage);
         holder.docuName.setText(arrayList.get(position).getGoodsName());
         holder.docuDetail.setText(arrayList.get(position).getDetail());
     }
@@ -43,10 +49,12 @@ public class docuAdapter extends RecyclerView.Adapter<docuAdapter.CustomViewHold
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
+        ImageView docuImage;
         TextView docuName;
         TextView docuDetail;
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.docuImage = itemView.findViewById(R.id.docuImage);
             this.docuName = itemView.findViewById((R.id.docuName));
             this.docuDetail = itemView.findViewById((R.id.docuDetail));
         }

@@ -31,6 +31,14 @@
             android:inputType="textPersonName" />
 
         <EditText
+            android:id="@+id/PhoneEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="핸드폰 번호: 010-xxxx-xxxx"
+            android:inputType="phone" />
+
+        <EditText
             android:id="@+id/boxEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

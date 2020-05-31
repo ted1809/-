@@ -37,7 +37,7 @@ public class PasswordResetActivity extends AppCompatActivity {
     };
 
     private void send(){
-        String email = ((EditText)findViewById(R.id.emaileditText)).getText().toString();
+        String email = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
 
         if(email.length() > 0){
             mAuth.sendPasswordResetEmail(email)

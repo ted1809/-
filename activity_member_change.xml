@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:gravity="center"
-        android:text="로그인"
+        android:text="회원정보 변경"
         android:textColor="#000000"
         android:textColorLink="#000000"
         android:textSize="24sp"
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="이메일"
+            android:hint="이름"
             android:inputType="textEmailAddress" />
 
         <EditText
@@ -35,21 +35,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="비밀번호"
+            android:hint="전화번호"
             android:inputType="textPassword" />
 
         <Button
             android:id="@+id/checkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="로그인" />
+            android:text="정보변경" />
 
-        <Button
-            android:id="@+id/gotoPasswordResetButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="비밀번호 재설정" />
     </LinearLayout>
-
 
 </LinearLayout>

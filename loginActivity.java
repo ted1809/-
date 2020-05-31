@@ -55,8 +55,8 @@ public class loginActivity extends AppCompatActivity {
     };
 
     private void login(){
-        String email = ((EditText)findViewById(R.id.emaileditText)).getText().toString();
-        String password = ((EditText)findViewById(R.id.passwordeditText)).getText().toString();
+        String email = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
+        String password = ((EditText)findViewById(R.id.phoneEditText)).getText().toString();
 
         if(email.length() > 0 && password.length() > 0){
             mAuth.signInWithEmailAndPassword(email, password)
