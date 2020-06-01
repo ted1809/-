@@ -1,10 +1,8 @@
-package com.example.logindb;
+package com.example.login;
 
 import java.io.Serializable;
 
 public class documentInfo implements Serializable {
-    private String boxnum;
-    private String userID;
     private String goodsName;
     private String detail;
     private boolean inOut;
@@ -21,27 +19,13 @@ public class documentInfo implements Serializable {
     public documentInfo(){
     }
 
-    public documentInfo(String boxnum, String userID, String goodsName, String detail, boolean inOut, String photoURL){
-        this.boxnum = boxnum;
-        this.userID = userID;
+    public documentInfo(String goodsName, String detail, boolean inOut, String photoURL){
         this.goodsName = goodsName;
         this.detail = detail;
         this.inOut = inOut;
         this.photoURL = photoURL;
     }
 
-    public String getBoxnum(){
-        return this.boxnum;
-    }
-    public void setBoxnum(){
-        this.boxnum = boxnum;
-    }
-    public String getUserID(){
-        return this.userID;
-    }
-    public void setUserID(){
-        this.userID = userID;
-    }
     public String getGoodsName(){
         return this.goodsName;
     }

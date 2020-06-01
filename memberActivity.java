@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -13,10 +13,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class memberActivity extends AppCompatActivity {
     private static final String TAG = "memberActivity";
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +58,11 @@ public class memberActivity extends AppCompatActivity {
         && phoneNumber.length() > 0){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+            mDatabase = FirebaseDatabase.getInstance().getReference();
 
             memberinfo memberinfo = new memberinfo(name, boxnum, date, phoneNumber,false);
 
-            if (user != null) {
+            /*if (user != null) {
                 db.collection("users").document(user.getEmail()).set(memberinfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -74,7 +78,22 @@ public class memberActivity extends AppCompatActivity {
                                 Log.w(TAG, "Error adding document", e);
                             }
                         });
-            }
+            }*/
+            mDatabase.child("users").child(user.getUid()).setValue(memberinfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>(){
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            startToast("회원정보 등록을 성공하였습니다.");
+                            finish();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    startToast("회원정보 등록 실패");
+                    Log.w(TAG, "Error adding document", e);
+                }
+            });
+
         }else{
             startToast("회원정보를 입력해주세요.");
         }
@@ -83,7 +102,5 @@ public class memberActivity extends AppCompatActivity {
     private void startToast(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
-
 }
 

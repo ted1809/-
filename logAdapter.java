@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Context;
 import android.graphics.Color;

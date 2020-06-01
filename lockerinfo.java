@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 public class lockerinfo {
     private String boxID;

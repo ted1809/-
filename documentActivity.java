@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -22,6 +22,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -33,7 +35,7 @@ public class documentActivity extends AppCompatActivity {
     private static final String TAG = "documentActivity";
     private ImageView imageView;
     private final int GET_GALLERY_IMAGE = 200;
-    String photoURL;
+    private DatabaseReference mDatabase;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -43,7 +45,7 @@ public class documentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_document);
 
-        imageView = (ImageView)findViewById(R.id.docuImage);
+        imageView = (ImageView)findViewById(R.id.docuImage); //이미지뷰 연결
 
         findViewById(R.id.checkButton).setOnClickListener(onClickLitsener);
         findViewById(R.id.docuImage).setOnClickListener(onClickLitsener);
@@ -69,16 +71,17 @@ public class documentActivity extends AppCompatActivity {
     private void infoUpdate(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         StorageReference storageRef = storage.getReference();
-        final StorageReference ImagesRef = storageRef.child("images/"+user.getEmail()+"_profile.jpg");
+        final StorageReference ImagesRef = storageRef.child("images/"+user.getUid()+"_profile.jpg");  //스토리지에 저장될 사진의 이름 설정
 
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap(); // 밑의 네 줄까지 이미지뷰에 저장되있는 사진을 스토리지에 보낼 준비
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = ImagesRef.putBytes(data);
+        UploadTask uploadTask = ImagesRef.putBytes(data); // 스토리지에 저장하는 함수
 
         Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
@@ -91,11 +94,11 @@ public class documentActivity extends AppCompatActivity {
             }
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
-            public void onComplete(@NonNull Task<Uri> task) {
+            public void onComplete(@NonNull Task<Uri> task) { //저장 성공시 실행되는 리스너 함수
                 if (task.isSuccessful()) {
                     String dname = ((EditText)findViewById(R.id.dnameEditText)).getText().toString();
                     String detail = ((EditText)findViewById(R.id.detailEditText)).getText().toString();
-                    Uri downloadUri = task.getResult();
+                    Uri downloadUri = task.getResult(); //사진의 저장경로를 뽑아오는 함수
                     Log.d(TAG, "SUCCESS"+ downloadUri);
 
                     if(dname.length() > 0){
@@ -104,14 +107,28 @@ public class documentActivity extends AppCompatActivity {
                         }
 
                         Intent intent = getIntent();
-                        documentInfo goodsRef = (documentInfo) intent.getSerializableExtra("goodsRef");
+                        //documentInfo goodsRef = (documentInfo) intent.getSerializableExtra("goodsRef");
                         String goodsRfid = intent.getExtras().getString("goodsRfid");
                         memberinfo memberRef = (memberinfo) intent.getSerializableExtra("memberRef");
 
-                        documentInfo documentInfo = new documentInfo(get_docu_boxnum(goodsRef), get_user_name(memberRef),
-                                dname, detail, false, downloadUri.toString());
+                        documentInfo documentInfo = new documentInfo(dname, detail, false, downloadUri.toString());
 
-                        db.collection("goods").document(goodsRfid).set(documentInfo)
+                        /*db.collection("goods").document(goodsRfid).set(documentInfo)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        startToast("물품 정보 갱신에 성공하였습니다");
+                                        finish();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        startToast("물품 등록 실패");
+                                        Log.w(TAG, "Error adding document", e);
+                                    }
+                                });*/
+                        mDatabase.child("locker").child(get_member_boxnum(memberRef)).child("goods").child(goodsRfid).setValue(documentInfo)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -153,18 +170,19 @@ public class documentActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
              */
-            imageView.setImageURI(selectedImageUri);
+            imageView.setImageURI(selectedImageUri); //갤러리에서 불러온 사진을 이미지뷰에 세트
         }
 
     }
 
 
-    public String get_docu_boxnum(documentInfo DI){
-        return DI.getBoxnum();
-    }
 
     public String get_user_name(memberinfo user){
         return user.getName();
+    }
+
+    private String get_member_boxnum(memberinfo memberinfo){
+        return memberinfo.getBoxnum();
     }
 
 

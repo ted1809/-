@@ -1,12 +1,20 @@
-package com.example.logindb;
+package com.example.login;
 
 public class RawLogInfo {
+    private String ID;
     private String boxnum;
-    private String goodsName;
     private boolean inOut;
 
     public RawLogInfo(){
 
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public void setID(String ID) {
+        this.ID = ID;
     }
 
     public String getBoxnum() {
@@ -15,14 +23,6 @@ public class RawLogInfo {
 
     public void setBoxnum(String boxnum) {
         this.boxnum = boxnum;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public void setGoodsName(String goodsName) {
-        this.goodsName = goodsName;
     }
 
     public boolean isInOut() {

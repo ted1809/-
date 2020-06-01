@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import java.io.Serializable;
 
@@ -20,6 +20,11 @@ public class memberinfo implements Serializable {
         this.date = memberinfo.getDate();
         this.phoneNumber = memberinfo.getPhoneNumber();
         this.access = memberinfo.getAccess();
+    }
+
+    public memberinfo(String name,String phoneNumber){
+        this.name = name;
+        this.phoneNumber = phoneNumber;
     }
 
     public memberinfo(String name, String boxnum, String date,String phoneNumber, boolean access){

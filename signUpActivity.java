@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -111,9 +111,6 @@ public class signUpActivity extends AppCompatActivity {
 
 
     }
-
-
-
 
     private void startToast(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();

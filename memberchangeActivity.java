@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,11 +7,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class memberchangeActivity extends AppCompatActivity {
@@ -19,6 +23,7 @@ public class memberchangeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +61,33 @@ public class memberchangeActivity extends AppCompatActivity {
         String phone = ((EditText)findViewById(R.id.phoneEditText)).getText().toString();
 
         if(name.length() > 0 && phone.length() > 0){
-            DocumentReference memberRef = db.collection("users").document(user.getEmail());
+            /*DocumentReference memberRef = db.collection("users").document(user.getEmail());
             memberRef.update("name", name);
-            memberRef.update("phoneNumber", phone);
+            memberRef.update("phoneNumber", phone);*/
+
+            Intent intent = getIntent();
+            memberinfo memberRef = (memberinfo)intent.getSerializableExtra("memberRef");
+
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+
+            setValue(memberRef, name, phone);
+
+            mDatabase.child("users").child(user.getUid()).setValue(memberRef)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                         @Override
+                         public void onSuccess(Void aVoid) {
+                             startToast("회원 정보 변경에 성공하였습니다");
+                             finish();
+                         }
+                     })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            startToast("정보 등록 실패");
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
+
         }else{
             startToast("변경할 이름과 전화번호를 입력해주세요");
         }
@@ -72,5 +101,10 @@ public class memberchangeActivity extends AppCompatActivity {
         Intent intent=new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    private void setValue(memberinfo memberinfo, String a, String b){
+        memberinfo.setName(a);
+        memberinfo.setPhoneNumber(b);
     }
 }

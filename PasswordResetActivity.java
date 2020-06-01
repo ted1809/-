@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.os.Bundle;
 import android.view.View;

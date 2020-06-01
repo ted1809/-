@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,7 +20,7 @@ public class docuAdapter extends RecyclerView.Adapter<docuAdapter.CustomViewHold
     private ArrayList<documentInfo> arrayList;
     private Context context;
 
-    public docuAdapter(ArrayList<documentInfo> arrayList, Context context) {
+    public docuAdapter(ArrayList<documentInfo> arrayList, Context context) { //생성자
         this.arrayList = arrayList;
         this.context = context;
     }
@@ -34,7 +34,7 @@ public class docuAdapter extends RecyclerView.Adapter<docuAdapter.CustomViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {  //실질적으로 텍스트뷰에 텍스트를 설정하는 부분
         Glide.with(holder.itemView)
                 .load(arrayList.get(position).getPhotoURL())
                 .into(holder.docuImage);
@@ -45,14 +45,14 @@ public class docuAdapter extends RecyclerView.Adapter<docuAdapter.CustomViewHold
     @Override
     public int getItemCount() {
         //삼항연산자
-        return (arrayList != null ? arrayList.size() : 0);
+        return (arrayList != null ? arrayList.size() : 0); // 널값이 아니면 리스트 사이즈를, 널값이면 0 반환
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         ImageView docuImage;
         TextView docuName;
         TextView docuDetail;
-        public CustomViewHolder(@NonNull View itemView) {
+        public CustomViewHolder(@NonNull View itemView) {  // 레이아웃 아이템들 연결
             super(itemView);
             this.docuImage = itemView.findViewById(R.id.docuImage);
             this.docuName = itemView.findViewById((R.id.docuName));

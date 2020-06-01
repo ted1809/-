@@ -1,31 +1,29 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 public class logLookupActivity extends AppCompatActivity {
     private static final String TAG = "logLookupActivity";
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference mDatabase;
 
 
     private RecyclerView recyclerView;
@@ -44,6 +42,7 @@ public class logLookupActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final memberinfo memberRef = (memberinfo)intent.getSerializableExtra("memberRef");
         Log.d(TAG, " => " + get_member_boxnum(memberRef));
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
 
         recyclerView = findViewById(R.id.logRecyclerView);
@@ -54,7 +53,7 @@ public class logLookupActivity extends AppCompatActivity {
 
         logList.clear();
 
-        db.collection("inOutList")
+        /*db.collection("inOutList")
                 .whereEqualTo("boxnum", get_member_boxnum(memberRef))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -81,6 +80,29 @@ public class logLookupActivity extends AppCompatActivity {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
+                });*/
+
+        mDatabase.child("inOutList").addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                            RawLogInfo RawLog = snapshot.getValue(RawLogInfo.class);
+                            if (RawLog != null) {
+                                if(get_log_boxnum(RawLog).equals(get_member_boxnum(memberRef))) {
+                                    logInfo log = new logInfo(snapshot.getKey(), get_log_ID(RawLog), get_log_inOut(RawLog));
+                                    Log.d(TAG, " => " + get_log_logTime(log));
+                                    logList.add(log);
+                                }
+                            }
+                        }
+                        adapter.notifyDataSetChanged(); //리스트 저장 및 새로고침
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "get failed ");
+                    }
                 });
 
         adapter = new logAdapter(logList, this);
@@ -91,9 +113,14 @@ public class logLookupActivity extends AppCompatActivity {
         return memberinfo.getBoxnum();
     }
 
-    private String get_log_goodsName(RawLogInfo rawLogInfo){
-        return rawLogInfo.getGoodsName();
+    private String get_log_ID(RawLogInfo rawLogInfo){
+        return rawLogInfo.getID();
     }
+
+    private String get_log_boxnum(RawLogInfo rawLogInfo){
+        return rawLogInfo.getBoxnum();
+    }
+
     private boolean get_log_inOut(RawLogInfo rawLogInfo){
         return rawLogInfo.isInOut();
     }

@@ -1,4 +1,4 @@
-package com.example.logindb;
+package com.example.login;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,27 +9,25 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 public class selectdocumentActivity extends AppCompatActivity {
     private static final String TAG = "selectdocumentActivity";
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference mDatabase;
 
 
     private RecyclerView recyclerView;
@@ -78,7 +76,7 @@ public class selectdocumentActivity extends AppCompatActivity {
 
         startToast("물건을 선택하시면 편집하실 수 있습니다.");
 
-        db.collection("goods")
+       /* db.collection("goods")
                 .whereEqualTo("boxnum", get_member_boxnum(memberRef))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -105,7 +103,7 @@ public class selectdocumentActivity extends AppCompatActivity {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
-                });
+                });*/
 
         /*readData(new Callback() {
             @Override
@@ -113,6 +111,25 @@ public class selectdocumentActivity extends AppCompatActivity {
                 Log.d(TAG, "SUCCESS");
             }
         });*/
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("locker").child(get_member_boxnum(memberRef)).child("goods").addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                            RFIDname.add(snapshot.getKey());
+                            documentInfo documentInfo = snapshot.getValue(documentInfo.class);
+                            arrayList.add(documentInfo);
+                        }
+                        adapter.notifyDataSetChanged(); //리스트 저장 및 새로고침
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "get failed ");
+                    }
+                });
 
         adapter = new docuAdapter(arrayList, this);
         recyclerView.setAdapter(adapter);
@@ -122,7 +139,6 @@ public class selectdocumentActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 Log.d(TAG, "SUCCESS");
                 documentInfo docu = arrayList.get(position);
-                Log.d(TAG, "=>" + docu.getBoxnum());
                 String rfid = RFIDname.get(position);
                 Log.d(TAG, "=>" + rfid);
                 startDActivity(documentActivity.class, docu, memberRef, rfid);
